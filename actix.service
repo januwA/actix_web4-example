@@ -1,0 +1,12 @@
+# linux 开机启动服务
+
+[Unit]
+Description=actix web
+After=all.target
+
+[Service]
+Type=simple
+ExecStart=/www/wwwroot/a.com/actix_backend/target/release/server
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    app
+    <p>
+      <button onclick="chooseImage()">chooseImage</button>
+    </p>
+
+    <p>
+      <button onclick="previewImage()">previewImage</button>
+    </p>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+    <script>
+      (async () => {
+        const res = await fetch(
+          `/api/wx/get_config?url=${encodeURIComponent(location.href.split("#")[0])}`
+        ).then((res) => res.json());
+        wx.config({
+          debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          ...res.data,
+
+          // 必填，需要使用的JS接口列表
+          jsApiList: [
+            "updateAppMessageShareData",
+            "updateTimelineShareData",
+            "onMenuShareWeibo",
+            "onMenuShareQZone",
+            "startRecord",
+            "stopRecord",
+            "onVoiceRecordEnd",
+            "playVoice",
+            "pauseVoice",
+            "stopVoice",
+            "onVoicePlayEnd",
+            "uploadVoice",
+            "downloadVoice",
+            "chooseImage",
+            "previewImage",
+            "uploadImage",
+            "downloadImage",
+            "translateVoice",
+            "getNetworkType",
+            "openLocation",
+            "getLocation",
+            "hideOptionMenu",
+            "showOptionMenu",
+            "hideMenuItems",
+            "showMenuItems",
+            "hideAllNonBaseMenuItem",
+            "showAllNonBaseMenuItem",
+            "closeWindow",
+            "scanQRCode",
+            "chooseWXPay",
+            "openProductSpecificView",
+            "addCard",
+            "chooseCard",
+            "openCard",
+          ],
+        });
+
+        wx.ready(function () {
+          // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+
+          let link = window.location.href,
+            title = "测试微信",
+            desc = "测试微信2",
+            imgUrl = `${window.location.href}svr-static/test.jpg`;
+
+          // // 自定义“分享给朋友”及“分享到QQ”按钮的分享内容（1.4.0）
+          // wx.updateAppMessageShareData({
+          //   title: title, // 分享标题
+          //   desc: desc, // 分享描述
+          //   link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+          //   imgUrl, // 分享图标
+          //   success: function () {
+          //     // 设置成功
+          //   },
+          // });
+
+          // // 自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容（1.4.0）
+          // wx.updateTimelineShareData({
+          //   title, // 分享标题
+          //   link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+          //   imgUrl, // 分享图标
+          //   success: function () {
+          //     // 设置成功
+          //   },
+          // });
+        });
+
+        wx.error(function (res) {
+          // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+          // alert(JSON.stringify(res));
+        });
+      })();
+
+      async function chooseImage() {
+        wx.chooseImage({
+          count: 1, // 默认9
+          sizeType: ["original", "compressed"], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ["album", "camera"], // 可以指定来源是相册还是相机，默认二者都有
+          success: function (res) {
+            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+            alert(JSON.stringify(localIds));
+          },
+        });
+      }
+
+      async function previewImage() {
+        let imgUrl = `${window.location.href}svr-static/test.jpg`;
+        wx.previewImage({
+          current: imgUrl, // 当前显示图片的http链接
+          urls: [imgUrl],
+        });
+      }
+    </script>
+    <script>
+      (async () => {
+        let params = new URLSearchParams(window.location.search);
+        let code = params.get("code");
+
+        // 没有登录进行登陆跳转
+        if (!localStorage.getItem("token") && !code) {
+          // 前端重定向到 wx登录
+          window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${"wxa23558ac5d235a60"}&redirect_uri=${encodeURIComponent(
+            window.location.href
+          )}&response_type=code&scope=${"snsapi_userinfo"}&state=1#wechat_redirect`;
+        } else {
+          // 重定向回来后会携带 code
+
+          if (code && !localStorage.getItem("token")) {
+            console.log("获取access_token");
+            let res = await fetch(`/api/wx/login?code=${code}`).then((e) => e.json());
+            localStorage.setItem("token", res.data);
+          }
+
+          // get userinfo
+          let user_id = localStorage.getItem("token");
+          if (!user_id) {
+            localStorage.removeItem("token");
+            window.location.reload();
+          }
+          let { data: userinfo } = await fetch(`/api/wx/get_userinfo?user_id=${user_id}`).then(
+            (e) => e.json()
+          );
+          console.log(userinfo);
+        }
+      })();
+    </script>
+  </body>
+</html>

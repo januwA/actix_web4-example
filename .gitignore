@@ -1,0 +1,12 @@
+/target
+
+.user.ini
+index.html
+404.html
+.htaccess
+
+/public/media/*
+!/public/media/.gitkeep
+
+/public/admin/*
+!/public/admin/.gitkeep

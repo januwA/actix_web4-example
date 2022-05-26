@@ -1,0 +1,42 @@
+[tasks.r]
+description = "监听服务器运行"
+install_crate = "cargo-watch"
+command = "cargo"
+args = [
+  "watch",
+  "-c",
+  "-i",
+  "config/**",
+  "-i",
+  ".vscode/**",
+  "-i",
+  "migrations/**",
+  "-i",
+  "target/**",
+  "-i",
+  "templates/**",
+  "-i",
+  "public/**",
+  "-i",
+  "*.md",
+  "-i",
+  "*.sh",
+  "-i",
+  "*.service",
+  "-i",
+  "*.env",
+  "-x",
+  "run --bin server",
+]
+
+[tasks.c]
+description = "检查代码"
+install_crate = "cargo-watch"
+command = "cargo"
+args = ["watch", "-c"]
+
+
+[tasks.build]
+description = "打包 release"
+command = "cargo"
+args = ["build", "--release"]

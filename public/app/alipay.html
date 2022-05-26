@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>支付宝电脑网站支付</title>
+  </head>
+  <body>
+    <button onclick="pay()">支付宝支付</button>
+    <script>
+      async function pay() {
+        // open("/api/ali/test_sign");
+        let newWindow = window.open("about:blank");
+        newWindow.location = '/api/ali/test_pay';
+
+        // const { data } = await fetch("/api/ali/test_pay").then((res) => res.json());
+        // window.open(`data:text/html,${data}`);
+      }
+    </script>
+  </body>
+</html>
